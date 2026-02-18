@@ -1,74 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NovaBank - Profile</title>
-  <link rel="stylesheet" href="css/styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaBank - Profile</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.container {
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.profile-card {
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-card h3 {
+    margin-bottom: 10px;
+}
+
+.profile-card p {
+    margin-bottom: 5px;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.action-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    padding: 12px;
+    background: #22c55e;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.action-link:hover {
+    background: #16a34a;
+}
+</style>
 </head>
-<body onload="loadProfile()">
+<body>
 
-<div class="header">
-  <img src="https://i.pravatar.cc/60?img=12" alt="Avatar" class="avatar">
-  <div class="header-info">
-    <h2>Kelvin Brooks</h2>
-    <p id="lastLoginProfile"></p>
-  </div>
-  <div class="header-right">
-    <button class="secondary-btn" onclick="goDashboard()">Dashboard</button>
-  </div>
+<div class="container">
+
+    <div class="header">
+        <h2>Profile</h2>
+        <a href="dashboard.html" style="color:white;text-decoration:none;">Dashboard</a>
+    </div>
+
+    <div class="profile-card">
+        <h3 id="userName">Kelvin Brooks</h3>
+        <p id="userEmail">kelvin@example.com</p>
+        <p>Current Balance: $<span id="balance">5,250.00</span></p>
+    </div>
+
+    <a href="dashboard.html" class="action-link">Back to Dashboard</a>
+
 </div>
 
-<div class="profile-container">
-  <h2>Profile</h2>
-  <p><strong>Name:</strong> Kelvin Brooks</p>
-  <p><strong>Email:</strong> kelvin@example.com</p>
-  <p><strong>Account Number:</strong> **** **** **** 4821</p>
-  <p><strong>Current Balance:</strong> <span id="profileBalance" class="strong-balance white-balance">$0.00</span></p>
-  <p><strong>Recent Transactions:</strong></p>
-  <div id="profileTransactions"></div>
-</div>
-
-<!-- Toast -->
-<div id="toast" class="toast"></div>
-
+<script src="js/app.js"></script>
 <script>
-// Load profile info
-function loadProfile() {
-  const balance = parseFloat(localStorage.getItem("balance")) || 0;
-  document.getElementById("profileBalance").innerText = "$" + balance.toFixed(2);
+document.addEventListener("DOMContentLoaded", function(){
+    // Display user info
+    const email = localStorage.getItem("userEmail") || "user@example.com";
+    const userName = document.getElementById("userName");
+    const userEmail = document.getElementById("userEmail");
+    if(userName) userName.innerText = email.split("@")[0];
+    if(userEmail) userEmail.innerText = email;
 
-  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-  const container = document.getElementById("profileTransactions");
-  container.innerHTML = "";
-  transactions.forEach(tx => {
-    const div = document.createElement("div");
-    div.classList.add("transaction-card");
-    let isSent = tx.toLowerCase().includes("sent");
-    let isReceived = tx.toLowerCase().includes("received");
-    if (isSent) { div.innerHTML = `🔴 ${tx}`; div.style.color = "#ff4d4d"; }
-    else if (isReceived) { div.innerHTML = `🟢 ${tx}`; div.style.color = "#00b894"; }
-    else { div.innerHTML = `🟡 ${tx}`; div.style.color = "#ffa500"; }
-    container.appendChild(div);
-  });
-
-  // Last login
-  const now = new Date();
-  const options = { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'};
-  document.getElementById("lastLoginProfile").innerText = "Last login: " + now.toLocaleString('en-US', options);
-}
-
-// Toast
-function showToast(message){ 
-  const toast = document.getElementById("toast"); 
-  toast.innerText = message; 
-  toast.className = "toast show"; 
-  setTimeout(()=>{ toast.className="toast"; },2500); 
-}
-
-// Navigation
-function goDashboard(){ window.location.href="dashboard.html"; }
-
+    // Display balance
+    const balanceEl = document.getElementById("balance");
+    if(balanceEl) {
+        const balance = parseFloat(localStorage.getItem("balance")) || 0;
+        balanceEl.innerText = balance.toFixed(2);
+    }
+});
 </script>
+
 </body>
 </html>
