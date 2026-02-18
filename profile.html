@@ -16,6 +16,14 @@
   <p>Current Balance: <span id="profileBalance">$0.00</span></p>
   <span class="badge">FDIC-insured</span>
 
+  <h3>Account Summary</h3>
+  <div id="summary">
+    <p>Total Sent: <span id="totalSent">$0.00</span></p>
+    <p>Total Received: <span id="totalReceived">$0.00</span></p>
+    <p>Total Added: <span id="totalAdded">$0.00</span></p>
+    <p>Total Requested: <span id="totalRequested">$0.00</span></p>
+  </div>
+
   <button class="primary-btn" onclick="backDashboard()">Back to Dashboard</button>
 </div>
 
@@ -24,10 +32,34 @@ function backDashboard() {
   window.location.href = "dashboard.html";
 }
 
-// Load balance from localStorage
+function formatCurrency(num) {
+  return "$" + parseFloat(num).toFixed(2);
+}
+
+// Load balance and calculate totals
 window.onload = function() {
   const balance = parseFloat(localStorage.getItem("balance")) || 0;
-  document.getElementById("profileBalance").innerText = "$" + balance.toFixed(2);
+  document.getElementById("profileBalance").innerText = formatCurrency(balance);
+
+  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+  let sent = 0, received = 0, added = 0, requested = 0;
+
+  transactions.forEach(tx => {
+    if(tx.toLowerCase().includes("sent")) {
+      sent += parseFloat(tx.match(/\$([\d,.]+)/)[1]);
+    } else if(tx.toLowerCase().includes("received")) {
+      received += parseFloat(tx.match(/\$([\d,.]+)/)[1]);
+    } else if(tx.toLowerCase().includes("added")) {
+      added += parseFloat(tx.match(/\$([\d,.]+)/)[1]);
+    } else if(tx.toLowerCase().includes("requested")) {
+      requested += parseFloat(tx.match(/\$([\d,.]+)/)[1]);
+    }
+  });
+
+  document.getElementById("totalSent").innerText = formatCurrency(sent);
+  document.getElementById("totalReceived").innerText = formatCurrency(received);
+  document.getElementById("totalAdded").innerText = formatCurrency(added);
+  document.getElementById("totalRequested").innerText = formatCurrency(requested);
 }
 </script>
 
