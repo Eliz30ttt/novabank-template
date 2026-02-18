@@ -6,9 +6,9 @@
   <title>NovaBank - Dashboard</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body onload="loadDashboard()">
+<body onload="initApp()">
 
-<div class="dashboard">
+<div class="dashboard" id="dashboardSection">
   <h2>Welcome, Kelvin Brooks</h2>
   <p>Account: **** **** **** 4821</p>
   <p>Account Type: Checking</p>
@@ -18,19 +18,79 @@
     <p id="balance">$0.00</p>
   </div>
 
-  <!-- Direct link instead of JS -->
-  <a href="send.html">
-    <button>Send Money</button>
-  </a>
+  <button onclick="showSend()">Send Money</button>
 
   <h3>Recent Transactions</h3>
   <div id="transactions"></div>
-
-  <p class="security">
-    FDIC-insured partner institution. Protected by bank-grade encryption.
-  </p>
 </div>
 
-<script src="js/app.js"></script>
+<div class="container" id="sendSection" style="display:none;">
+  <h2>Send Money</h2>
+
+  <input type="email" id="recipient" placeholder="Recipient Email" required>
+  <input type="number" id="amount" placeholder="Amount" required>
+
+  <button onclick="sendMoney()">Confirm Transfer</button>
+  <button onclick="showDashboard()">Cancel</button>
+
+  <p class="security">Transactions are protected with bank-grade encryption.</p>
+</div>
+
+<script>
+function initApp() {
+  if(!localStorage.getItem("balance")) localStorage.setItem("balance", 4820.55);
+  if(!localStorage.getItem("transactions")) localStorage.setItem("transactions", JSON.stringify([]));
+  loadDashboard();
+}
+
+function loadDashboard() {
+  const balance = parseFloat(localStorage.getItem("balance"));
+  document.getElementById("balance").innerText = "$" + balance.toFixed(2);
+
+  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+  const container = document.getElementById("transactions");
+  container.innerHTML = "";
+
+  transactions.forEach(tx => {
+    const div = document.createElement("div");
+    div.innerText = tx;
+    container.appendChild(div);
+  });
+}
+
+function showSend() {
+  document.getElementById("dashboardSection").style.display = "none";
+  document.getElementById("sendSection").style.display = "block";
+}
+
+function showDashboard() {
+  document.getElementById("sendSection").style.display = "none";
+  document.getElementById("dashboardSection").style.display = "block";
+  loadDashboard();
+}
+
+function sendMoney() {
+  const amount = parseFloat(document.getElementById("amount").value);
+  const recipient = document.getElementById("recipient").value || "Unknown";
+  let balance = parseFloat(localStorage.getItem("balance"));
+
+  if(!amount || amount <=0){ alert("Enter a valid amount"); return;}
+  if(amount>balance){ alert("Insufficient funds"); return;}
+
+  balance -= amount;
+  localStorage.setItem("balance", balance);
+
+  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+  transactions.unshift(`Sent $${amount.toFixed(2)} to ${recipient}`);
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
+  // Clear inputs
+  document.getElementById("recipient").value = "";
+  document.getElementById("amount").value = "";
+
+  showDashboard(); // instantly update dashboard
+}
+</script>
+
 </body>
 </html>
