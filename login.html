@@ -3,86 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovaBank Login</title>
+<title>NovaBank - Client Login</title>
 <link rel="stylesheet" href="css/styles.css">
 <style>
-.login-container {
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: linear-gradient(135deg, #2563eb, #1e3a8a);
 }
-
-.login-box {
-    background: #0f172a;
+.login-container {
+    background: white;
     padding: 30px;
     border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     width: 90%;
     max-width: 400px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.login-container h2 {
     text-align: center;
-}
-
-.login-box h2 {
     margin-bottom: 20px;
-    color: white;
+    color: #1e3a8a;
 }
-
-.login-box input {
+.input-group {
+    margin-bottom: 15px;
+}
+.input-group input {
     width: 100%;
     padding: 12px;
-    margin: 10px 0;
     border-radius: 10px;
-    border: none;
+    border: 1px solid #cbd5e1;
 }
-
-.login-box button {
+button {
     width: 100%;
     padding: 12px;
-    margin-top: 15px;
     border-radius: 10px;
     border: none;
-    background: #22c55e;
+    background: #2563eb;
     color: white;
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
 }
-
-.login-box button:hover {
-    background: #16a34a;
+button:hover { background: #1e40af; }
+.error {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+    display: none;
 }
 </style>
 </head>
 <body>
 
 <div class="login-container">
-    <div class="login-box">
-        <h2>NovaBank</h2>
+    <h2>NovaBank Login</h2>
+    <div class="input-group">
         <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
-        <button id="loginBtn">Login</button>
     </div>
+    <div class="input-group">
+        <input type="password" id="password" placeholder="Password">
+    </div>
+    <button id="loginBtn">Login</button>
+    <div class="error" id="errorMsg">Invalid credentials</div>
 </div>
 
 <script src="js/app.js"></script>
 <script>
-document.getElementById("loginBtn").addEventListener("click", function() {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+document.addEventListener("DOMContentLoaded", function(){
+    const loginBtn = document.getElementById("loginBtn");
+    const errorMsg = document.getElementById("errorMsg");
 
-    if(email === "" || password === "") {
-        alert("Enter valid credentials");
-        return;
-    }
+    loginBtn.addEventListener("click", function(){
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
 
-    // Mock login: save email in LocalStorage
-    localStorage.setItem("userEmail", email);
+        if(!email || !password){
+            errorMsg.innerText = "Please enter email and password";
+            errorMsg.style.display = "block";
+            return;
+        }
 
-    // Redirect to dashboard
-    window.location.href = "dashboard.html";
+        // Mock login: password must be "1234"
+        if(password === "1234"){
+            localStorage.setItem("userEmail", email);
+            // Initialize balance if not exist
+            if(!localStorage.getItem("balance") || isNaN(localStorage.getItem("balance"))){
+                localStorage.setItem("balance", "5250.00");
+            }
+            // Initialize transactions if not exist
+            if(!localStorage.getItem("transactions")){
+                localStorage.setItem("transactions", JSON.stringify([
+                    "Received $2,000.00 from Salary",
+                    "Sent $120.00 to John"
+                ]));
+            }
+            window.location.href = "dashboard.html";
+        } else {
+            errorMsg.innerText = "Invalid credentials";
+            errorMsg.style.display = "block";
+        }
+    });
 });
 </script>
 
