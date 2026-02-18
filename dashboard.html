@@ -6,28 +6,51 @@
 <title>NovaBank Dashboard</title>
 
 <style>
-body { font-family: Arial; margin:0; background:#f3f4f6; }
-.header { background:#1e3a8a; color:white; padding:20px; display:flex; justify-content:space-between; align-items:center; }
-.card { background:white; margin:20px; padding:20px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.08); }
-.balance { font-size:28px; font-weight:bold; color:#1e3a8a; }
-.actions button { margin:5px; padding:10px 15px; border-radius:8px; border:none; cursor:pointer; }
+body { margin:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f7fa; }
+.header {
+  background:#0a2f5a;
+  color:white;
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.header h1 { margin:0; font-size:1.8rem; }
+.card {
+  background:white;
+  border-radius:15px;
+  padding:20px;
+  margin:20px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.08);
+}
+.balance { font-size:32px; font-weight:bold; color:#0a2f5a; }
+.actions button {
+  margin:5px;
+  padding:10px 15px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  transition:0.3s;
+}
 .actions button.deposit { background:#16a34a; color:white; }
 .actions button.withdraw { background:#dc2626; color:white; }
 .actions button.send { background:#2563eb; color:white; }
 .transactions { margin-top:20px; max-height:300px; overflow-y:auto; }
-.tx { border-bottom:1px solid #ddd; padding:8px 0; display:flex; justify-content:space-between; }
-.admin-link { margin:20px; display:block; color:#1e3a8a; text-decoration:none; font-weight:bold; }
+.tx { display:flex; justify-content:space-between; border-bottom:1px solid #ddd; padding:8px 0; }
+.tx span { font-weight:500; }
+.admin-link { display:block; margin:20px; text-decoration:none; font-weight:bold; color:#0a2f5a; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div id="welcome">Loading...</div>
-  <button id="logoutBtn">Logout</button>
+  <h1>NovaBank Dashboard</h1>
+  <button id="logoutBtn" style="background:#2563eb; color:white; padding:10px 15px; border-radius:8px; border:none; cursor:pointer;">Logout</button>
 </div>
 
 <div class="card">
-  <h3>Account Balance</h3>
+  <h3>Balance</h3>
   <div class="balance" id="balance">$0.00</div>
 </div>
 
@@ -46,10 +69,10 @@ body { font-family: Arial; margin:0; background:#f3f4f6; }
 <a href="admin.html" class="admin-link">Admin Panel</a>
 
 <script type="module">
-import { auth, db, signOut, onAuthStateChanged, doc, getDoc, updateDoc } from "./js/firebase.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, updateDoc } from "./js/firebase.js";
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const welcome = document.getElementById("welcome");
+const welcome = document.getElementById("balance");
 const balanceEl = document.getElementById("balance");
 const txContainer = document.getElementById("transactions");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -57,102 +80,67 @@ const logoutBtn = document.getElementById("logoutBtn");
 let currentUser;
 let currentData;
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
+onAuthStateChanged(auth, async (user)=>{
+  if(!user) window.location.href="login.html";
   currentUser = user;
-  welcome.innerText = "Welcome, " + user.email;
   await loadUserData();
 });
 
-// --- Load user balance and transactions ---
-async function loadUserData() {
+async function loadUserData(){
   const snap = await getDoc(doc(db,"users",currentUser.uid));
   currentData = snap.data();
-
-  balanceEl.innerText = "$" + currentData.balance.toFixed(2);
-
-  txContainer.innerHTML = "";
-  (currentData.transactions || []).slice().reverse().forEach(tx => {
-    const color = tx.type === "send" ? "#dc2626" : (tx.type==="receive"?"#16a34a":"#000");
-    txContainer.innerHTML += `<div class="tx">
-      <span>${tx.type.toUpperCase()}</span>
-      <span style="color:${color}">$${tx.amount.toFixed(2)}</span>
-    </div>`;
+  balanceEl.innerText = "$"+currentData.balance.toFixed(2);
+  txContainer.innerHTML="";
+  (currentData.transactions||[]).slice().reverse().forEach(tx=>{
+    const color = tx.type==="send"?"#dc2626":(tx.type==="receive"?"#16a34a":"#000");
+    txContainer.innerHTML += `<div class="tx"><span>${tx.type.toUpperCase()}</span><span style="color:${color}">$${tx.amount.toFixed(2)}</span></div>`;
   });
 }
 
-// --- Deposit ---
-window.deposit = async function() {
-  const amount = parseFloat(prompt("Deposit amount:"));
-  if(!amount || amount <= 0) return;
-
-  currentData.balance += amount;
-  addTransaction("deposit", amount);
+window.deposit = async ()=>{
+  const amount=parseFloat(prompt("Deposit amount:"));
+  if(!amount||amount<=0) return;
+  currentData.balance+=amount;
+  addTransaction("deposit",amount);
   await save();
 }
 
-// --- Withdraw ---
-window.withdraw = async function() {
-  const amount = parseFloat(prompt("Withdraw amount:"));
-  if(!amount || amount <= 0 || amount > currentData.balance) return alert("Insufficient balance.");
-
-  currentData.balance -= amount;
-  addTransaction("withdraw", amount);
+window.withdraw = async ()=>{
+  const amount=parseFloat(prompt("Withdraw amount:"));
+  if(!amount||amount<=0||amount>currentData.balance) return alert("Insufficient balance");
+  currentData.balance-=amount;
+  addTransaction("withdraw",amount);
   await save();
 }
 
-// --- Send Money ---
-window.sendMoney = async function() {
-  const email = prompt("Send to email:");
-  const amount = parseFloat(prompt("Amount:"));
-  if(!email || !amount || amount <= 0 || amount > currentData.balance) return alert("Invalid input or insufficient balance.");
-
-  const q = query(collection(db,"users"), where("email","==",email));
+window.sendMoney = async ()=>{
+  const email=prompt("Send to email:");
+  const amount=parseFloat(prompt("Amount:"));
+  if(!email||!amount||amount<=0||amount>currentData.balance) return alert("Invalid input or insufficient balance");
+  const q=query(collection(db,"users"),where("email","==",email));
   const querySnap = await getDocs(q);
-
-  if(querySnap.empty){
-    alert("User not found");
-    return;
-  }
-
-  const receiverDoc = querySnap.docs[0];
-  const receiverData = receiverDoc.data();
-  receiverData.balance += amount;
-
-  await updateDoc(receiverDoc.ref, {
-    balance: receiverData.balance,
-    transactions: [...(receiverData.transactions||[]), { type:"receive", amount, from: currentUser.email }]
-  });
-
-  currentData.balance -= amount;
-  addTransaction("send", amount);
+  if(querySnap.empty){ alert("User not found"); return; }
+  const receiverDoc=querySnap.docs[0];
+  const receiverData=receiverDoc.data();
+  receiverData.balance+=amount;
+  await updateDoc(receiverDoc.ref,{ balance:receiverData.balance, transactions:[...(receiverData.transactions||[]),{type:"receive",amount,from:currentUser.email}] });
+  currentData.balance-=amount;
+  addTransaction("send",amount);
   await save();
 }
 
-// --- Add transaction locally ---
-function addTransaction(type, amount) {
+function addTransaction(type,amount){
   if(!currentData.transactions) currentData.transactions=[];
-  currentData.transactions.push({ type, amount, date: new Date() });
+  currentData.transactions.push({type,amount,date:new Date()});
 }
 
-// --- Save to Firestore ---
-async function save() {
-  await updateDoc(doc(db,"users",currentUser.uid), {
-    balance: currentData.balance,
-    transactions: currentData.transactions
-  });
+async function save(){
+  await updateDoc(doc(db,"users",currentUser.uid),{balance:currentData.balance,transactions:currentData.transactions});
   await loadUserData();
 }
 
-// --- Logout ---
-logoutBtn.addEventListener("click", async () => {
-  await signOut(auth);
-  window.location.href = "login.html";
-});
+logoutBtn.addEventListener("click",async()=>{await signOut(auth);window.location.href="login.html";});
 </script>
 
 </body>
-</html>
+                           </html>
