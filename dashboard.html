@@ -52,7 +52,6 @@
   <input type="number" id="amount" placeholder="Amount" required>
   <button class="primary-btn" id="sendBtn">Confirm Transfer</button>
   <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
-  <p class="security">Transactions are protected with bank-grade encryption.</p>
 </div>
 
 <!-- Receive Money -->
@@ -83,18 +82,12 @@
 
 <script>
 function initApp() {
-  if(!localStorage.getItem("balance") || isNaN(localStorage.getItem("balance"))) {
-    localStorage.setItem("balance", "4820.55");
-  }
-  if(!localStorage.getItem("transactions")) {
-    localStorage.setItem("transactions", JSON.stringify([
-      "Received $120.00 from Alice",
-      "Sent $50.00 to Bob"
-    ]));
-  }
+  if(!localStorage.getItem("balance") || isNaN(localStorage.getItem("balance"))) localStorage.setItem("balance","4820.55");
+  if(!localStorage.getItem("transactions")) localStorage.setItem("transactions",JSON.stringify(["Received $120.00 from Alice","Sent $50.00 to Bob"]));
   updateLastLogin();
   updateNotifications();
   loadDashboard();
+  setupInputValidation();
 }
 
 function updateLastLogin() {
@@ -106,140 +99,101 @@ function updateLastLogin() {
 function loadDashboard() {
   const balance = parseFloat(localStorage.getItem("balance")) || 0;
   document.getElementById("balance").innerText = "$" + balance.toFixed(2);
-
   const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
   const container = document.getElementById("transactions");
   container.innerHTML = "";
-
-  transactions.forEach(tx => {
-    const div = document.createElement("div");
+  transactions.forEach(tx=>{
+    const div=document.createElement("div");
     div.classList.add("transaction-card");
-
     let isSent = tx.toLowerCase().includes("sent");
     let isReceived = tx.toLowerCase().includes("received");
-    if(isSent) {
-      div.innerHTML = `🔴 ${tx}`;
-      div.style.color = "#ff4d4d";
-    } else if(isReceived) {
-      div.innerHTML = `🟢 ${tx}`;
-      div.style.color = "#00b894";
-    } else {
-      div.innerHTML = `🟡 ${tx}`;
-      div.style.color = "#ffa500";
-    }
-
+    if(isSent) { div.innerHTML=`🔴 ${tx}`; div.style.color="#ff4d4d"; }
+    else if(isReceived) { div.innerHTML=`🟢 ${tx}`; div.style.color="#00b894"; }
+    else { div.innerHTML=`🟡 ${tx}`; div.style.color="#ffa500"; }
     container.appendChild(div);
   });
 }
 
-function showSend() { showSection("sendSection"); }
-function showReceive() { showSection("receiveSection"); }
-function showAdd() { showSection("addSection"); }
-function showRequest() { showSection("requestSection"); }
+function showSection(id){ ["sendSection","receiveSection","addSection","requestSection"].forEach(s=>document.getElementById(s).style.display=s===id?"block":"none"); document.getElementById("dashboardSection").style.display="none"; document.getElementById("headerSection").style.display="none"; }
+function showSend(){ showSection("sendSection"); }
+function showReceive(){ showSection("receiveSection"); }
+function showAdd(){ showSection("addSection"); }
+function showRequest(){ showSection("requestSection"); }
+function showDashboard(){ showSection(""); document.getElementById("dashboardSection").style.display="block"; document.getElementById("headerSection").style.display="flex"; loadDashboard(); }
+function goProfile(){ window.location.href="profile.html"; }
 
-function showDashboard() {
-  document.getElementById("sendSection").style.display = "none";
-  document.getElementById("receiveSection").style.display = "none";
-  document.getElementById("addSection").style.display = "none";
-  document.getElementById("requestSection").style.display = "none";
-  document.getElementById("dashboardSection").style.display = "block";
-  document.getElementById("headerSection").style.display = "flex";
-  loadDashboard();
-}
-
-function showSection(sectionId) {
-  document.getElementById("dashboardSection").style.display = "none";
-  document.getElementById("headerSection").style.display = "none";
-  ["sendSection","receiveSection","addSection","requestSection"].forEach(id=>{
-    document.getElementById(id).style.display = (id===sectionId) ? "block" : "none";
+function setupInputValidation(){
+  const inputs=["amount","recipient","receiveAmount","sender","addAmount","requestAmount","requestName"];
+  inputs.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input",()=>{ const val=el.value.trim();
+      if(id.includes("Amount")){ const num=parseFloat(val); if(!isNaN(num)&&num>0){ el.classList.add("valid"); el.classList.remove("invalid"); } else { el.classList.add("invalid"); el.classList.remove("valid"); } }
+      if(id.includes("recipient")||id.includes("sender")||id.includes("requestName")){ if(val.length>0){ el.classList.add("valid"); el.classList.remove("invalid"); } else { el.classList.add("invalid"); el.classList.remove("valid"); }
+    });
   });
 }
 
-function goProfile() {
-  window.location.href = "profile.html";
-}
-
 // Send Money
-document.getElementById("sendBtn")?.addEventListener("click", function(){
-  const amount = parseFloat(document.getElementById("amount").value) || 0;
-  const recipient = document.getElementById("recipient").value || "Unknown";
-
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
-
-  if(amount <= 0){ alert("Enter a valid amount"); return; }
-  if(amount > balance){ alert("Insufficient funds"); return; }
-
-  balance -= amount;
-  localStorage.setItem("balance", balance.toFixed(2));
-
-  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+document.getElementById("sendBtn")?.addEventListener("click",()=>{
+  const amount=parseFloat(document.getElementById("amount").value)||0;
+  const recipient=document.getElementById("recipient").value||"Unknown";
+  let balance=parseFloat(localStorage.getItem("balance"))||0;
+  if(amount<=0){ alert("Enter a valid amount"); return; }
+  if(amount>balance){ alert("Insufficient funds"); return; }
+  balance-=amount; localStorage.setItem("balance",balance.toFixed(2));
+  const transactions=JSON.parse(localStorage.getItem("transactions")||"[]");
   transactions.unshift(`Sent $${amount.toFixed(2)} to ${recipient}`);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-
-  document.getElementById("recipient").value = "";
-  document.getElementById("amount").value = "";
+  localStorage.setItem("transactions",JSON.stringify(transactions));
+  document.getElementById("recipient").value=""; document.getElementById("amount").value="";
   showDashboard();
 });
 
 // Receive Money
-document.getElementById("receiveBtn")?.addEventListener("click", function(){
-  const amount = parseFloat(document.getElementById("receiveAmount").value) || 0;
-  const sender = document.getElementById("sender").value || "Unknown";
-
-  if(amount <= 0){ alert("Enter a valid amount"); return; }
-
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
-  balance += amount;
-  localStorage.setItem("balance", balance.toFixed(2));
-
-  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+document.getElementById("receiveBtn")?.addEventListener("click",()=>{
+  const amount=parseFloat(document.getElementById("receiveAmount").value)||0;
+  const sender=document.getElementById("sender").value||"Unknown";
+  if(amount<=0){ alert("Enter a valid amount"); return; }
+  let balance=parseFloat(localStorage.getItem("balance"))||0;
+  balance+=amount; localStorage.setItem("balance",balance.toFixed(2));
+  const transactions=JSON.parse(localStorage.getItem("transactions")||"[]");
   transactions.unshift(`Received $${amount.toFixed(2)} from ${sender}`);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-
-  document.getElementById("sender").value = "";
-  document.getElementById("receiveAmount").value = "";
+  localStorage.setItem("transactions",JSON.stringify(transactions));
+  document.getElementById("sender").value=""; document.getElementById("receiveAmount").value="";
   showDashboard();
 });
 
 // Add Money
-document.getElementById("addBtn")?.addEventListener("click", function(){
-  const amount = parseFloat(document.getElementById("addAmount").value) || 0;
-  if(amount <= 0){ alert("Enter a valid amount"); return; }
-
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
-  balance += amount;
-  localStorage.setItem("balance", balance.toFixed(2));
-
-  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+document.getElementById("addBtn")?.addEventListener("click",()=>{
+  const amount=parseFloat(document.getElementById("addAmount").value)||0;
+  if(amount<=0){ alert("Enter a valid amount"); return; }
+  let balance=parseFloat(localStorage.getItem("balance"))||0;
+  balance+=amount; localStorage.setItem("balance",balance.toFixed(2));
+  const transactions=JSON.parse(localStorage.getItem("transactions")||"[]");
   transactions.unshift(`Added $${amount.toFixed(2)} to account`);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-
-  document.getElementById("addAmount").value = "";
+  localStorage.setItem("transactions",JSON.stringify(transactions));
+  document.getElementById("addAmount").value="";
   showDashboard();
 });
 
 // Request Money
-document.getElementById("requestBtn")?.addEventListener("click", function(){
-  const amount = parseFloat(document.getElementById("requestAmount").value) || 0;
-  const name = document.getElementById("requestName").value || "Someone";
-
-  if(amount <= 0){ alert("Enter a valid amount"); return; }
-
-  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+document.getElementById("requestBtn")?.addEventListener("click",()=>{
+  const amount=parseFloat(document.getElementById("requestAmount").value)||0;
+  const name=document.getElementById("requestName").value||"Someone";
+  if(amount<=0){ alert("Enter a valid amount"); return; }
+  const transactions=JSON.parse(localStorage.getItem("transactions")||"[]");
   transactions.unshift(`Requested $${amount.toFixed(2)} from ${name}`);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-
-  document.getElementById("requestName").value = "";
-  document.getElementById("requestAmount").value = "";
+  localStorage.setItem("transactions",JSON.stringify(transactions));
+  document.getElementById("requestName").value=""; document.getElementById("requestAmount").value="";
   showDashboard();
 });
 
-// Random notifications
-function updateNotifications() {
-  const notifCount = Math.floor(Math.random() * 5) + 1;
-  document.getElementById("notifBadge").innerText = notifCount;
+// Notifications
+function updateNotifications(){
+  const notifCount=Math.floor(Math.random()*5)+1;
+  document.getElementById("notifBadge").innerText=notifCount;
 }
 </script>
 
 </body>
-</html>
+    </html>
