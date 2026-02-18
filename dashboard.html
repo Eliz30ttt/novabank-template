@@ -33,7 +33,13 @@
     <span class="badge">FDIC-insured</span>
   </div>
 
-  <button class="primary-btn" onclick="showSend()">Send Money</button>
+  <!-- Action Buttons -->
+  <div class="dashboard-actions">
+    <button class="primary-btn" onclick="showSend()">Send Money</button>
+    <button class="primary-btn" onclick="showReceive()">Receive Money</button>
+    <button class="primary-btn" onclick="showAdd()">Add Money</button>
+    <button class="primary-btn" onclick="showRequest()">Request Money</button>
+  </div>
 
   <h3>Recent Transactions</h3>
   <div id="transactions"></div>
@@ -42,14 +48,37 @@
 <!-- Send Money -->
 <div class="container" id="sendSection" style="display:none;">
   <h2>Send Money</h2>
-
   <input type="email" id="recipient" placeholder="Recipient Email" required>
   <input type="number" id="amount" placeholder="Amount" required>
-
   <button class="primary-btn" id="sendBtn">Confirm Transfer</button>
   <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
-
   <p class="security">Transactions are protected with bank-grade encryption.</p>
+</div>
+
+<!-- Receive Money -->
+<div class="container" id="receiveSection" style="display:none;">
+  <h2>Receive Money</h2>
+  <input type="text" id="sender" placeholder="Sender Name" required>
+  <input type="number" id="receiveAmount" placeholder="Amount" required>
+  <button class="primary-btn" id="receiveBtn">Confirm Receipt</button>
+  <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
+</div>
+
+<!-- Add Money -->
+<div class="container" id="addSection" style="display:none;">
+  <h2>Add Money</h2>
+  <input type="number" id="addAmount" placeholder="Amount" required>
+  <button class="primary-btn" id="addBtn">Add Funds</button>
+  <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
+</div>
+
+<!-- Request Money -->
+<div class="container" id="requestSection" style="display:none;">
+  <h2>Request Money</h2>
+  <input type="text" id="requestName" placeholder="Who to request from" required>
+  <input type="number" id="requestAmount" placeholder="Amount" required>
+  <button class="primary-btn" id="requestBtn">Generate Request</button>
+  <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
 </div>
 
 <script>
@@ -87,44 +116,58 @@ function loadDashboard() {
     div.classList.add("transaction-card");
 
     let isSent = tx.toLowerCase().includes("sent");
-    div.innerHTML = `${isSent ? '🔴' : '🟢'} ${tx}`;
-    div.style.color = isSent ? "#ff4d4d" : "#00b894";
+    let isReceived = tx.toLowerCase().includes("received");
+    if(isSent) {
+      div.innerHTML = `🔴 ${tx}`;
+      div.style.color = "#ff4d4d";
+    } else if(isReceived) {
+      div.innerHTML = `🟢 ${tx}`;
+      div.style.color = "#00b894";
+    } else {
+      div.innerHTML = `🟡 ${tx}`;
+      div.style.color = "#ffa500";
+    }
 
     container.appendChild(div);
   });
 }
 
-function showSend() {
-  document.getElementById("dashboardSection").style.display = "none";
-  document.getElementById("sendSection").style.display = "block";
-  document.getElementById("headerSection").style.display = "none";
-}
+function showSend() { showSection("sendSection"); }
+function showReceive() { showSection("receiveSection"); }
+function showAdd() { showSection("addSection"); }
+function showRequest() { showSection("requestSection"); }
 
 function showDashboard() {
   document.getElementById("sendSection").style.display = "none";
+  document.getElementById("receiveSection").style.display = "none";
+  document.getElementById("addSection").style.display = "none";
+  document.getElementById("requestSection").style.display = "none";
   document.getElementById("dashboardSection").style.display = "block";
   document.getElementById("headerSection").style.display = "flex";
   loadDashboard();
+}
+
+function showSection(sectionId) {
+  document.getElementById("dashboardSection").style.display = "none";
+  document.getElementById("headerSection").style.display = "none";
+  ["sendSection","receiveSection","addSection","requestSection"].forEach(id=>{
+    document.getElementById(id).style.display = (id===sectionId) ? "block" : "none";
+  });
 }
 
 function goProfile() {
   window.location.href = "profile.html";
 }
 
-document.getElementById("sendBtn")?.addEventListener("click", function() {
+// Send Money
+document.getElementById("sendBtn")?.addEventListener("click", function(){
   const amount = parseFloat(document.getElementById("amount").value) || 0;
   const recipient = document.getElementById("recipient").value || "Unknown";
 
   let balance = parseFloat(localStorage.getItem("balance")) || 0;
 
-  if(amount <= 0){
-    alert("Enter a valid amount");
-    return;
-  }
-  if(amount > balance){
-    alert("Insufficient funds");
-    return;
-  }
+  if(amount <= 0){ alert("Enter a valid amount"); return; }
+  if(amount > balance){ alert("Insufficient funds"); return; }
 
   balance -= amount;
   localStorage.setItem("balance", balance.toFixed(2));
@@ -135,7 +178,59 @@ document.getElementById("sendBtn")?.addEventListener("click", function() {
 
   document.getElementById("recipient").value = "";
   document.getElementById("amount").value = "";
+  showDashboard();
+});
 
+// Receive Money
+document.getElementById("receiveBtn")?.addEventListener("click", function(){
+  const amount = parseFloat(document.getElementById("receiveAmount").value) || 0;
+  const sender = document.getElementById("sender").value || "Unknown";
+
+  if(amount <= 0){ alert("Enter a valid amount"); return; }
+
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+  balance += amount;
+  localStorage.setItem("balance", balance.toFixed(2));
+
+  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+  transactions.unshift(`Received $${amount.toFixed(2)} from ${sender}`);
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
+  document.getElementById("sender").value = "";
+  document.getElementById("receiveAmount").value = "";
+  showDashboard();
+});
+
+// Add Money
+document.getElementById("addBtn")?.addEventListener("click", function(){
+  const amount = parseFloat(document.getElementById("addAmount").value) || 0;
+  if(amount <= 0){ alert("Enter a valid amount"); return; }
+
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+  balance += amount;
+  localStorage.setItem("balance", balance.toFixed(2));
+
+  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+  transactions.unshift(`Added $${amount.toFixed(2)} to account`);
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
+  document.getElementById("addAmount").value = "";
+  showDashboard();
+});
+
+// Request Money
+document.getElementById("requestBtn")?.addEventListener("click", function(){
+  const amount = parseFloat(document.getElementById("requestAmount").value) || 0;
+  const name = document.getElementById("requestName").value || "Someone";
+
+  if(amount <= 0){ alert("Enter a valid amount"); return; }
+
+  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+  transactions.unshift(`Requested $${amount.toFixed(2)} from ${name}`);
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
+  document.getElementById("requestName").value = "";
+  document.getElementById("requestAmount").value = "";
   showDashboard();
 });
 
