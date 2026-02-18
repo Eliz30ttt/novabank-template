@@ -8,11 +8,16 @@
 </head>
 <body onload="initApp()">
 
-<div class="dashboard" id="dashboardSection">
-  <h2>Welcome, Kelvin Brooks</h2>
-  <p>Account: **** **** **** 4821</p>
-  <p>Account Type: Checking</p>
+<!-- Header / Banner -->
+<div class="header">
+  <img src="https://i.pravatar.cc/60?img=12" alt="Avatar" class="avatar">
+  <div class="header-info">
+    <h2>Kelvin Brooks</h2>
+    <p id="lastLogin"></p>
+  </div>
+</div>
 
+<div class="dashboard" id="dashboardSection">
   <div class="card">
     <h3>Current Balance</h3>
     <p id="balance">$0.00</p>
@@ -44,7 +49,14 @@ function initApp() {
   if(!localStorage.getItem("transactions")) {
     localStorage.setItem("transactions", JSON.stringify([]));
   }
+  updateLastLogin();
   loadDashboard();
+}
+
+function updateLastLogin() {
+  const now = new Date();
+  const options = { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'};
+  document.getElementById("lastLogin").innerText = "Last login: " + now.toLocaleString('en-US', options);
 }
 
 function loadDashboard() {
