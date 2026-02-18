@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovaBank - Client Login</title>
-<link rel="stylesheet" href="css/styles.css">
+<title>NovaBank Login</title>
+
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -14,28 +14,29 @@ body {
     align-items: center;
     height: 100vh;
 }
-.login-container {
+
+.container {
     background: white;
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     width: 90%;
     max-width: 400px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
-.login-container h2 {
+
+h2 {
     text-align: center;
-    margin-bottom: 20px;
     color: #1e3a8a;
 }
-.input-group {
-    margin-bottom: 15px;
-}
-.input-group input {
+
+input {
     width: 100%;
     padding: 12px;
+    margin: 10px 0;
     border-radius: 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid #ccc;
 }
+
 button {
     width: 100%;
     padding: 12px;
@@ -45,68 +46,86 @@ button {
     color: white;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.2s;
+    margin-top: 10px;
 }
-button:hover { background: #1e40af; }
+
 .error {
     color: red;
     text-align: center;
     margin-top: 10px;
-    display: none;
 }
 </style>
 </head>
 <body>
 
-<div class="login-container">
+<div class="container">
     <h2>NovaBank Login</h2>
-    <div class="input-group">
-        <input type="email" id="email" placeholder="Email">
-    </div>
-    <div class="input-group">
-        <input type="password" id="password" placeholder="Password">
-    </div>
+
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+
     <button id="loginBtn">Login</button>
-    <div class="error" id="errorMsg">Invalid credentials</div>
+    <button id="registerBtn" style="background:#16a34a;">Create Account</button>
+
+    <div class="error" id="errorMsg"></div>
 </div>
 
-<script src="js/app.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-    const loginBtn = document.getElementById("loginBtn");
-    const errorMsg = document.getElementById("errorMsg");
+<script type="module">
+import {
+  auth,
+  db,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  doc,
+  setDoc
+} from "./js/firebase.js";
 
-    loginBtn.addEventListener("click", function(){
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
+const loginBtn = document.getElementById("loginBtn");
+const registerBtn = document.getElementById("registerBtn");
+const errorMsg = document.getElementById("errorMsg");
 
-        if(!email || !password){
-            errorMsg.innerText = "Please enter email and password";
-            errorMsg.style.display = "block";
-            return;
-        }
+// Register
+registerBtn.addEventListener("click", async () => {
+    const email = emailInput();
+    const password = passwordInput();
 
-        // Mock login: password must be "1234"
-        if(password === "1234"){
-            localStorage.setItem("userEmail", email);
-            // Initialize balance if not exist
-            if(!localStorage.getItem("balance") || isNaN(localStorage.getItem("balance"))){
-                localStorage.setItem("balance", "5250.00");
-            }
-            // Initialize transactions if not exist
-            if(!localStorage.getItem("transactions")){
-                localStorage.setItem("transactions", JSON.stringify([
-                    "Received $2,000.00 from Salary",
-                    "Sent $120.00 to John"
-                ]));
-            }
-            window.location.href = "dashboard.html";
-        } else {
-            errorMsg.innerText = "Invalid credentials";
-            errorMsg.style.display = "block";
-        }
-    });
+    try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+        // Create user document in Firestore
+        await setDoc(doc(db, "users", userCred.user.uid), {
+            email: email,
+            balance: 5000,
+            createdAt: new Date()
+        });
+
+        window.location.href = "dashboard.html";
+
+    } catch (error) {
+        errorMsg.innerText = error.message;
+    }
 });
+
+// Login
+loginBtn.addEventListener("click", async () => {
+    const email = emailInput();
+    const password = passwordInput();
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard.html";
+    } catch (error) {
+        errorMsg.innerText = error.message;
+    }
+});
+
+function emailInput(){
+    return document.getElementById("email").value.trim();
+}
+
+function passwordInput(){
+    return document.getElementById("password").value.trim();
+}
 </script>
 
 </body>
