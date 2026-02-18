@@ -18,12 +18,17 @@
     <p id="balance">$0.00</p>
   </div>
 
-  <button onclick="goToSend()">Send Money</button>
+  <!-- Direct link instead of JS -->
+  <a href="send.html">
+    <button>Send Money</button>
+  </a>
 
   <h3>Recent Transactions</h3>
   <div id="transactions"></div>
 
-  <p class="security">FDIC-insured partner institution. Protected by bank-grade encryption.</p>
+  <p class="security">
+    FDIC-insured partner institution. Protected by bank-grade encryption.
+  </p>
 </div>
 
 <script src="js/app.js"></script>
