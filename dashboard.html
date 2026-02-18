@@ -8,7 +8,6 @@
 </head>
 <body onload="initApp()">
 
-<!-- Header -->
 <div class="header" id="headerSection">
   <img src="https://i.pravatar.cc/60?img=12" alt="Avatar" class="avatar">
   <div class="header-info">
@@ -22,30 +21,25 @@
   </div>
 </div>
 
-<!-- Dashboard -->
 <div class="dashboard" id="dashboardSection">
   <h2 class="welcome-msg">Welcome, Kelvin Brooks</h2>
-  
   <div class="card gradient-card">
     <h3>Current Balance</h3>
     <p id="balance" class="strong-balance white-balance">$0.00</p>
     <p class="account-number">Account: **** **** **** 4821</p>
     <span class="badge">FDIC-insured</span>
   </div>
-
-  <!-- Action Buttons -->
   <div class="dashboard-actions">
     <button class="primary-btn" onclick="showSend()">Send Money</button>
     <button class="primary-btn" onclick="showReceive()">Receive Money</button>
     <button class="primary-btn" onclick="showAdd()">Add Money</button>
     <button class="primary-btn" onclick="showRequest()">Request Money</button>
   </div>
-
   <h3>Recent Transactions</h3>
   <div id="transactions"></div>
 </div>
 
-<!-- Send Money -->
+<!-- Send -->
 <div class="container" id="sendSection" style="display:none;">
   <h2>Send Money</h2>
   <input type="email" id="recipient" placeholder="Recipient Email" required>
@@ -54,7 +48,7 @@
   <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
 </div>
 
-<!-- Receive Money -->
+<!-- Receive -->
 <div class="container" id="receiveSection" style="display:none;">
   <h2>Receive Money</h2>
   <input type="text" id="sender" placeholder="Sender Name" required>
@@ -63,7 +57,7 @@
   <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
 </div>
 
-<!-- Add Money -->
+<!-- Add -->
 <div class="container" id="addSection" style="display:none;">
   <h2>Add Money</h2>
   <input type="number" id="addAmount" placeholder="Amount" required>
@@ -71,7 +65,7 @@
   <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
 </div>
 
-<!-- Request Money -->
+<!-- Request -->
 <div class="container" id="requestSection" style="display:none;">
   <h2>Request Money</h2>
   <input type="text" id="requestName" placeholder="Who to request from" required>
@@ -80,41 +74,43 @@
   <button class="secondary-btn" onclick="showDashboard()">Cancel</button>
 </div>
 
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
 <script>
+// -------------------- INIT --------------------
 function initApp() {
   if(!localStorage.getItem("balance") || isNaN(localStorage.getItem("balance"))) localStorage.setItem("balance","4820.55");
   if(!localStorage.getItem("transactions")) localStorage.setItem("transactions",JSON.stringify(["Received $120.00 from Alice","Sent $50.00 to Bob"]));
-  updateLastLogin();
-  updateNotifications();
-  loadDashboard();
-  setupInputValidation();
+  updateLastLogin(); updateNotifications(); loadDashboard(); setupInputValidation();
 }
 
 function updateLastLogin() {
-  const now = new Date();
-  const options = { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'};
-  document.getElementById("lastLogin").innerText = "Last login: " + now.toLocaleString('en-US', options);
+  const now=new Date();
+  const options={ weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'};
+  document.getElementById("lastLogin").innerText="Last login: "+now.toLocaleString('en-US',options);
 }
 
+// -------------------- DASHBOARD --------------------
 function loadDashboard() {
-  const balance = parseFloat(localStorage.getItem("balance")) || 0;
-  document.getElementById("balance").innerText = "$" + balance.toFixed(2);
-  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-  const container = document.getElementById("transactions");
-  container.innerHTML = "";
+  const balance=parseFloat(localStorage.getItem("balance"))||0;
+  document.getElementById("balance").innerText="$"+balance.toFixed(2);
+  const transactions=JSON.parse(localStorage.getItem("transactions")||"[]");
+  const container=document.getElementById("transactions");
+  container.innerHTML="";
   transactions.forEach(tx=>{
     const div=document.createElement("div");
     div.classList.add("transaction-card");
-    let isSent = tx.toLowerCase().includes("sent");
-    let isReceived = tx.toLowerCase().includes("received");
-    if(isSent) { div.innerHTML=`🔴 ${tx}`; div.style.color="#ff4d4d"; }
-    else if(isReceived) { div.innerHTML=`🟢 ${tx}`; div.style.color="#00b894"; }
-    else { div.innerHTML=`🟡 ${tx}`; div.style.color="#ffa500"; }
+    let isSent=tx.toLowerCase().includes("sent");
+    let isReceived=tx.toLowerCase().includes("received");
+    if(isSent){ div.innerHTML=`🔴 ${tx}`; div.style.color="#ff4d4d"; }
+    else if(isReceived){ div.innerHTML=`🟢 ${tx}`; div.style.color="#00b894"; }
+    else{ div.innerHTML=`🟡 ${tx}`; div.style.color="#ffa500"; }
     container.appendChild(div);
   });
 }
 
-function showSection(id){ ["sendSection","receiveSection","addSection","requestSection"].forEach(s=>document.getElementById(s).style.display=s===id?"block":"none"); document.getElementById("dashboardSection").style.display="none"; document.getElementById("headerSection").style.display="none"; }
+function showSection(id){ ["sendSection","receiveSection","addSection","requestSection"].forEach(s=>document.getElementById(s).style.display=s===id?"block":"none"); document.getElementById("dashboardSection").style.display=id?"none":"block"; document.getElementById("headerSection").style.display=id?"none":"flex"; loadDashboard();}
 function showSend(){ showSection("sendSection"); }
 function showReceive(){ showSection("receiveSection"); }
 function showAdd(){ showSection("addSection"); }
@@ -122,19 +118,25 @@ function showRequest(){ showSection("requestSection"); }
 function showDashboard(){ showSection(""); document.getElementById("dashboardSection").style.display="block"; document.getElementById("headerSection").style.display="flex"; loadDashboard(); }
 function goProfile(){ window.location.href="profile.html"; }
 
+// -------------------- INPUT VALIDATION --------------------
 function setupInputValidation(){
   const inputs=["amount","recipient","receiveAmount","sender","addAmount","requestAmount","requestName"];
   inputs.forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
-    el.addEventListener("input",()=>{ const val=el.value.trim();
+    el.addEventListener("input",()=>{
+      const val=el.value.trim();
       if(id.includes("Amount")){ const num=parseFloat(val); if(!isNaN(num)&&num>0){ el.classList.add("valid"); el.classList.remove("invalid"); } else { el.classList.add("invalid"); el.classList.remove("valid"); } }
       if(id.includes("recipient")||id.includes("sender")||id.includes("requestName")){ if(val.length>0){ el.classList.add("valid"); el.classList.remove("invalid"); } else { el.classList.add("invalid"); el.classList.remove("valid"); }
     });
   });
 }
 
-// Send Money
+// -------------------- TOAST --------------------
+function showToast(message){ const toast=document.getElementById("toast"); toast.innerText=message; toast.className="toast show"; setTimeout(()=>{ toast.className="toast"; },2500); }
+
+// -------------------- ACTIONS --------------------
+// Send
 document.getElementById("sendBtn")?.addEventListener("click",()=>{
   const amount=parseFloat(document.getElementById("amount").value)||0;
   const recipient=document.getElementById("recipient").value||"Unknown";
@@ -146,10 +148,11 @@ document.getElementById("sendBtn")?.addEventListener("click",()=>{
   transactions.unshift(`Sent $${amount.toFixed(2)} to ${recipient}`);
   localStorage.setItem("transactions",JSON.stringify(transactions));
   document.getElementById("recipient").value=""; document.getElementById("amount").value="";
+  showToast(`$${amount.toFixed(2)} sent to ${recipient}`);
   showDashboard();
 });
 
-// Receive Money
+// Receive
 document.getElementById("receiveBtn")?.addEventListener("click",()=>{
   const amount=parseFloat(document.getElementById("receiveAmount").value)||0;
   const sender=document.getElementById("sender").value||"Unknown";
@@ -160,10 +163,11 @@ document.getElementById("receiveBtn")?.addEventListener("click",()=>{
   transactions.unshift(`Received $${amount.toFixed(2)} from ${sender}`);
   localStorage.setItem("transactions",JSON.stringify(transactions));
   document.getElementById("sender").value=""; document.getElementById("receiveAmount").value="";
+  showToast(`$${amount.toFixed(2)} received from ${sender}`);
   showDashboard();
 });
 
-// Add Money
+// Add
 document.getElementById("addBtn")?.addEventListener("click",()=>{
   const amount=parseFloat(document.getElementById("addAmount").value)||0;
   if(amount<=0){ alert("Enter a valid amount"); return; }
@@ -173,10 +177,11 @@ document.getElementById("addBtn")?.addEventListener("click",()=>{
   transactions.unshift(`Added $${amount.toFixed(2)} to account`);
   localStorage.setItem("transactions",JSON.stringify(transactions));
   document.getElementById("addAmount").value="";
+  showToast(`$${amount.toFixed(2)} added to your account`);
   showDashboard();
 });
 
-// Request Money
+// Request
 document.getElementById("requestBtn")?.addEventListener("click",()=>{
   const amount=parseFloat(document.getElementById("requestAmount").value)||0;
   const name=document.getElementById("requestName").value||"Someone";
@@ -185,15 +190,13 @@ document.getElementById("requestBtn")?.addEventListener("click",()=>{
   transactions.unshift(`Requested $${amount.toFixed(2)} from ${name}`);
   localStorage.setItem("transactions",JSON.stringify(transactions));
   document.getElementById("requestName").value=""; document.getElementById("requestAmount").value="";
+  showToast(`$${amount.toFixed(2)} requested from ${name}`);
   showDashboard();
 });
 
 // Notifications
-function updateNotifications(){
-  const notifCount=Math.floor(Math.random()*5)+1;
-  document.getElementById("notifBadge").innerText=notifCount;
-}
-</script>
+function updateNotifications(){ const notifCount=Math.floor(Math.random()*5)+1; document.getElementById("notifBadge").innerText=notifCount; }
 
+</script>
 </body>
-    </html>
+</html>
