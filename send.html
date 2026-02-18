@@ -1,54 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NovaBank - Send Money</title>
-  <link rel="stylesheet" href="css/styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaBank - Send Money</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.container {
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #22c55e;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #16a34a;
+}
+</style>
 </head>
 <body>
 
 <div class="container">
-  <h2>Send Money</h2>
 
-  <input type="email" id="recipient" placeholder="Recipient Email" required>
-  <input type="number" id="amount" placeholder="Amount" required>
+    <div class="header">
+        <h2>Send Money</h2>
+        <a href="dashboard.html" style="color:white;text-decoration:none;">Dashboard</a>
+    </div>
 
-  <button id="sendBtn">Confirm Transfer</button>
-  <a href="dashboard.html"><button>Cancel</button></a>
+    <div class="input-group">
+        <input type="text" id="recipient" placeholder="Recipient Name">
+    </div>
 
-  <p class="security">Transactions are protected with bank-grade encryption.</p>
+    <div class="input-group">
+        <input type="number" id="amount" placeholder="Amount ($)">
+    </div>
+
+    <button id="sendBtn">Send</button>
+
 </div>
 
 <script src="js/app.js"></script>
 <script>
-document.getElementById("sendBtn").addEventListener("click", function() {
-  const recipient = document.getElementById("recipient").value || "Unknown";
-  const amount = parseFloat(document.getElementById("amount").value);
-  let balance = parseFloat(localStorage.getItem("balance"));
-
-  if (!amount || amount <= 0) {
-    alert("Enter a valid amount");
-    return;
-  }
-
-  if (amount > balance) {
-    alert("Insufficient funds");
-    return;
-  }
-
-  // Deduct balance
-  balance -= amount;
-  localStorage.setItem("balance", balance);
-
-  // Add transaction
-  const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-  const newTx = `Sent $${amount.toFixed(2)} to ${recipient}`;
-  transactions.unshift(newTx);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-
-  // Redirect to dashboard
-  window.location.href = "dashboard.html";
+document.addEventListener("DOMContentLoaded", function(){
+    // Ensure the balance shows up if needed
+    const balanceEl = document.getElementById("balance");
+    if(balanceEl) {
+        const balance = parseFloat(localStorage.getItem("balance")) || 0;
+        balanceEl.innerText = "$" + balance.toFixed(2);
+    }
 });
 </script>
 
