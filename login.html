@@ -7,126 +7,59 @@
 
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background: #f3f4f6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
-
 .container {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
-
-h2 {
-    text-align: center;
-    color: #1e3a8a;
-}
-
+h2 { text-align:center; color:#1e3a8a; }
 input {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 10px;
-    border: 1px solid #ccc;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #ccc;
 }
-
 button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: #2563eb;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
 }
-
-.error {
-    color: red;
-    text-align: center;
-    margin-top: 10px;
-}
+#loginBtn { background: #2563eb; color:white; }
+#registerBtn { background: #16a34a; color:white; }
+.error { color: red; text-align:center; margin-top: 10px; }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>NovaBank Login</h2>
+  <h2>NovaBank Login</h2>
 
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
 
-    <button id="loginBtn">Login</button>
-    <button id="registerBtn" style="background:#16a34a;">Create Account</button>
+  <button id="loginBtn">Login</button>
+  <button id="registerBtn">Create Account</button>
 
-    <div class="error" id="errorMsg"></div>
+  <div class="error" id="errorMsg"></div>
 </div>
 
-<script type="module">
-import {
-  auth,
-  db,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  doc,
-  setDoc
-} from "./js/firebase.js";
-
-const loginBtn = document.getElementById("loginBtn");
-const registerBtn = document.getElementById("registerBtn");
-const errorMsg = document.getElementById("errorMsg");
-
-// Register
-registerBtn.addEventListener("click", async () => {
-    const email = emailInput();
-    const password = passwordInput();
-
-    try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-
-        // Create user document in Firestore
-        await setDoc(doc(db, "users", userCred.user.uid), {
-            email: email,
-            balance: 5000,
-            createdAt: new Date()
-        });
-
-        window.location.href = "dashboard.html";
-
-    } catch (error) {
-        errorMsg.innerText = error.message;
-    }
-});
-
-// Login
-loginBtn.addEventListener("click", async () => {
-    const email = emailInput();
-    const password = passwordInput();
-
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "dashboard.html";
-    } catch (error) {
-        errorMsg.innerText = error.message;
-    }
-});
-
-function emailInput(){
-    return document.getElementById("email").value.trim();
-}
-
-function passwordInput(){
-    return document.getElementById("password").value.trim();
-}
-</script>
+<script type="module" src="js/login.js"></script>
 
 </body>
 </html>
