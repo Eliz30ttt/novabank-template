@@ -1,49 +1,22 @@
-// Firebase CDN imports (WORKS in normal HTML projects)
-
+// Import Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-
-// 🔹 Your Firebase config
+// Your Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyDDEqYWqiK0LhyqoZBix2I9jM3IPVpAIjc",
-  authDomain: "novaspirebank-6ddf3.firebaseapp.com",
-  projectId: "novaspirebank-6ddf3",
-  storageBucket: "novaspirebank-6ddf3.firebasestorage.app",
-  messagingSenderId: "943003513813",
-  appId: "1:943003513813:web:6fa745d41fb31b0a03435c"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
 };
 
-// Initialize Firebase
+// Initialize
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-
-// Export helpers
-export {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc
-};
+// Export
+export { auth, db, signOut };
