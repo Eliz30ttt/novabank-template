@@ -1,146 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovaBank Dashboard</title>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body { margin:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f7fa; }
-.header {
-  background:#0a2f5a;
-  color:white;
-  padding:20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.header h1 { margin:0; font-size:1.8rem; }
-.card {
-  background:white;
-  border-radius:15px;
-  padding:20px;
-  margin:20px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.08);
-}
-.balance { font-size:32px; font-weight:bold; color:#0a2f5a; }
-.actions button {
-  margin:5px;
-  padding:10px 15px;
-  border-radius:8px;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-  transition:0.3s;
-}
-.actions button.deposit { background:#16a34a; color:white; }
-.actions button.withdraw { background:#dc2626; color:white; }
-.actions button.send { background:#2563eb; color:white; }
-.transactions { margin-top:20px; max-height:300px; overflow-y:auto; }
-.tx { display:flex; justify-content:space-between; border-bottom:1px solid #ddd; padding:8px 0; }
-.tx span { font-weight:500; }
-.admin-link { display:block; margin:20px; text-decoration:none; font-weight:bold; color:#0a2f5a; }
-</style>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+    }
+
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      background: #ef4444;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #dc2626;
+    }
+
+    .content {
+      padding: 30px;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="header">
-  <h1>NovaBank Dashboard</h1>
-  <button id="logoutBtn" style="background:#2563eb; color:white; padding:10px 15px; border-radius:8px; border:none; cursor:pointer;">Logout</button>
-</div>
+  <header>
+    <h2>Admin Dashboard</h2>
+    <button id="logoutBtn">Logout</button>
+  </header>
 
-<div class="card">
-  <h3>Balance</h3>
-  <div class="balance" id="balance">$0.00</div>
-</div>
+  <div class="content">
+    <h3>Welcome to the secure area</h3>
+    <p>You are successfully logged in.</p>
+  </div>
 
-<div class="card actions">
-  <h3>Actions</h3>
-  <button class="deposit" onclick="deposit()">Deposit</button>
-  <button class="withdraw" onclick="withdraw()">Withdraw</button>
-  <button class="send" onclick="sendMoney()">Send Money</button>
-</div>
-
-<div class="card">
-  <h3>Transaction History</h3>
-  <div class="transactions" id="transactions"></div>
-</div>
-
-<a href="admin.html" class="admin-link">Admin Panel</a>
-
-<script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, updateDoc } from "./js/firebase.js";
-import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const welcome = document.getElementById("balance");
-const balanceEl = document.getElementById("balance");
-const txContainer = document.getElementById("transactions");
-const logoutBtn = document.getElementById("logoutBtn");
-
-let currentUser;
-let currentData;
-
-onAuthStateChanged(auth, async (user)=>{
-  if(!user) window.location.href="login.html";
-  currentUser = user;
-  await loadUserData();
-});
-
-async function loadUserData(){
-  const snap = await getDoc(doc(db,"users",currentUser.uid));
-  currentData = snap.data();
-  balanceEl.innerText = "$"+currentData.balance.toFixed(2);
-  txContainer.innerHTML="";
-  (currentData.transactions||[]).slice().reverse().forEach(tx=>{
-    const color = tx.type==="send"?"#dc2626":(tx.type==="receive"?"#16a34a":"#000");
-    txContainer.innerHTML += `<div class="tx"><span>${tx.type.toUpperCase()}</span><span style="color:${color}">$${tx.amount.toFixed(2)}</span></div>`;
-  });
-}
-
-window.deposit = async ()=>{
-  const amount=parseFloat(prompt("Deposit amount:"));
-  if(!amount||amount<=0) return;
-  currentData.balance+=amount;
-  addTransaction("deposit",amount);
-  await save();
-}
-
-window.withdraw = async ()=>{
-  const amount=parseFloat(prompt("Withdraw amount:"));
-  if(!amount||amount<=0||amount>currentData.balance) return alert("Insufficient balance");
-  currentData.balance-=amount;
-  addTransaction("withdraw",amount);
-  await save();
-}
-
-window.sendMoney = async ()=>{
-  const email=prompt("Send to email:");
-  const amount=parseFloat(prompt("Amount:"));
-  if(!email||!amount||amount<=0||amount>currentData.balance) return alert("Invalid input or insufficient balance");
-  const q=query(collection(db,"users"),where("email","==",email));
-  const querySnap = await getDocs(q);
-  if(querySnap.empty){ alert("User not found"); return; }
-  const receiverDoc=querySnap.docs[0];
-  const receiverData=receiverDoc.data();
-  receiverData.balance+=amount;
-  await updateDoc(receiverDoc.ref,{ balance:receiverData.balance, transactions:[...(receiverData.transactions||[]),{type:"receive",amount,from:currentUser.email}] });
-  currentData.balance-=amount;
-  addTransaction("send",amount);
-  await save();
-}
-
-function addTransaction(type,amount){
-  if(!currentData.transactions) currentData.transactions=[];
-  currentData.transactions.push({type,amount,date:new Date()});
-}
-
-async function save(){
-  await updateDoc(doc(db,"users",currentUser.uid),{balance:currentData.balance,transactions:currentData.transactions});
-  await loadUserData();
-}
-
-logoutBtn.addEventListener("click",async()=>{await signOut(auth);window.location.href="login.html";});
-</script>
+  <script type="module" src="js/dashboard.js"></script>
 
 </body>
-                           </html>
+</html>
