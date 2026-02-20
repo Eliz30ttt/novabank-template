@@ -3,11 +3,224 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovaBank</title>
-<link rel="stylesheet" href="style.css">
+<title>NovaBank — Demo Fintech Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+
+body {
+  background: #0f172a;
+  color: white;
+  overflow-x:hidden;
+}
+
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:25px 8%;
+  position:fixed;
+  width:100%;
+  background:rgba(15,23,42,0.8);
+  backdrop-filter:blur(10px);
+}
+
+header h2 { font-weight:800; letter-spacing:1px; }
+
+header a {
+  text-decoration:none;
+  color:white;
+  border:1px solid rgba(255,255,255,0.3);
+  padding:10px 20px;
+  border-radius:30px;
+  transition:0.3s;
+}
+
+header a:hover {
+  background:white;
+  color:#0f172a;
+}
+
+.hero {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:0 20px;
+  background: radial-gradient(circle at top right,#1e3a8a,#0f172a);
+}
+
+.hero h1 {
+  font-size:clamp(40px,6vw,70px);
+  font-weight:800;
+  margin-bottom:20px;
+}
+
+.hero p {
+  max-width:600px;
+  opacity:0.7;
+  margin-bottom:40px;
+}
+
+.cta-btn {
+  background:linear-gradient(135deg,#3b82f6,#6366f1);
+  padding:15px 35px;
+  border-radius:40px;
+  border:none;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.cta-btn:hover {
+  transform:scale(1.05);
+}
+
+.section {
+  padding:100px 8%;
+  text-align:center;
+}
+
+.cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:30px;
+  margin-top:50px;
+}
+
+.card {
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:40px 25px;
+  border-radius:20px;
+  backdrop-filter:blur(15px);
+  transition:0.3s;
+}
+
+.card:hover {
+  transform:translateY(-10px);
+  background:rgba(255,255,255,0.08);
+}
+
+.demo-app {
+  margin-top:50px;
+  background:white;
+  color:black;
+  padding:40px;
+  border-radius:25px;
+  max-width:800px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.balance {
+  font-size:30px;
+  font-weight:700;
+  margin-bottom:20px;
+}
+
+button.action {
+  padding:10px 20px;
+  margin:10px;
+  border:none;
+  border-radius:8px;
+  background:#111827;
+  color:white;
+  cursor:pointer;
+}
+
+footer {
+  text-align:center;
+  padding:30px;
+  opacity:0.6;
+  font-size:14px;
+}
+</style>
 </head>
+
 <body>
-  <h1>Welcome to NovaBank</h1>
-  <a href="login.html"><button>Login</button></a>
+
+<header>
+  <h2>NovaBank</h2>
+  <a href="#demo">Live Demo</a>
+</header>
+
+<section class="hero">
+  <h1>The Future of Digital Finance</h1>
+  <p>A next-generation fintech demo experience built to simulate elite banking technology. 
+  This is a demonstration project for UI/UX and product concept purposes only.</p>
+  <button class="cta-btn" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+    Explore Demo
+  </button>
+</section>
+
+<section class="section">
+  <h2>Why NovaBank?</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Instant Transfers</h3>
+      <p>Simulated lightning-fast global transactions with elite security architecture.</p>
+    </div>
+    <div class="card">
+      <h3>AI Risk Engine</h3>
+      <p>Demo AI-powered fraud detection and smart analytics dashboard.</p>
+    </div>
+    <div class="card">
+      <h3>Elite Experience</h3>
+      <p>Modern fintech UI inspired by Stripe, Apple Pay, and Revolut.</p>
+    </div>
+  </div>
+</section>
+
+<section id="demo" class="section">
+  <h2>Interactive Demo</h2>
+
+  <div class="demo-app">
+    <div class="balance" id="balance">$25,000.00</div>
+
+    <button class="action" onclick="add()">Add $1,000</button>
+    <button class="action" onclick="send()">Send $500</button>
+    <button class="action" onclick="reset()">Reset</button>
+  </div>
+</section>
+
+<footer>
+NovaBank © 2026 — Demo Fintech Concept. Not a real bank. No real money transactions.
+</footer>
+
+<script>
+let balance = 25000;
+
+function update() {
+  document.getElementById("balance").innerText =
+    "$" + balance.toLocaleString();
+}
+
+function add() {
+  balance += 1000;
+  update();
+}
+
+function send() {
+  if (balance >= 500) {
+    balance -= 500;
+    update();
+  } else {
+    alert("Insufficient demo balance.");
+  }
+}
+
+function reset() {
+  balance = 25000;
+  update();
+}
+
+update();
+</script>
+
 </body>
 </html>
