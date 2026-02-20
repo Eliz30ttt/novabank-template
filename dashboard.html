@@ -1,58 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f1f5f9;
-    }
-
-    header {
-      background: #0f172a;
-      color: white;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    button {
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: none;
-      background: #ef4444;
-      color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #dc2626;
-    }
-
-    .content {
-      padding: 30px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - NovaBank</title>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <h1>Dashboard</h1>
+  <p>Welcome, valued client!</p>
+  <button id="logoutBtn">Logout</button>
 
-  <header>
-    <h2>Admin Dashboard</h2>
-    <button id="logoutBtn">Logout</button>
-  </header>
-
-  <div class="content">
-    <h3>Welcome to the secure area</h3>
-    <p>You are successfully logged in.</p>
-  </div>
-
-  <script type="module" src="js/dashboard.js"></script>
-
+  <script type="module" src="./js/dashboard.js"></script>
 </body>
 </html>
