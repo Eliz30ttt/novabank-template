@@ -3,13 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - NovaBank</title>
+<title>NovaBank Admin</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background-color: #003366;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 24px;
+  }
+  header button {
+    background-color: #ffcc00;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  main {
+    padding: 30px;
+  }
+  .user-list {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+  }
+  .user-list h2 {
+    margin-top: 0;
+  }
+  .user {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .user button {
+    background-color: #003366;
+    color: #ffcc00;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
-  <h1>Admin Portal</h1>
-  <p>Welcome, Admin!</p>
-  <button id="logoutBtn">Logout</button>
+  <header>
+    <h1>Admin Portal</h1>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <main>
+    <div class="user-list">
+      <h2>All Users</h2>
+      <div class="user">
+        <span>user1@novabank.com</span>
+        <button>View</button>
+      </div>
+      <div class="user">
+        <span>user2@novabank.com</span>
+        <button>View</button>
+      </div>
+      <div class="user">
+        <span>admin@novabank.com</span>
+        <button>View</button>
+      </div>
+    </div>
+  </main>
 
   <script type="module" src="./js/admin.js"></script>
 </body>
