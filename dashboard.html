@@ -3,13 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - NovaBank</title>
+<title>NovaBank Dashboard</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  /* Modern PayPal-style dashboard styles */
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background-color: #003366;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 24px;
+  }
+  header button {
+    background-color: #ffcc00;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  main {
+    padding: 30px;
+  }
+  .balance-card {
+    background: #003366;
+    color: white;
+    border-radius: 15px;
+    padding: 30px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  .action-btn {
+    flex: 1;
+    background-color: #ffcc00;
+    color: #003366;
+    border: none;
+    padding: 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+  }
+  .transactions {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+  }
+  .transactions h2 {
+    margin-top: 0;
+  }
+  .transaction {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+  }
+</style>
 </head>
 <body>
-  <h1>Dashboard</h1>
-  <p>Welcome, valued client!</p>
-  <button id="logoutBtn">Logout</button>
+  <header>
+    <h1>Welcome, Kelvin Brooks</h1>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <main>
+    <div class="balance-card">
+      <span>Current Balance</span>
+      <span id="balance">$12,345.67</span>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn" onclick="alert('Send Money Clicked')">Send Money</button>
+      <button class="action-btn" onclick="alert('Receive Money Clicked')">Receive Money</button>
+      <button class="action-btn" onclick="alert('Add Money Clicked')">Add Money</button>
+      <button class="action-btn" onclick="alert('Request Money Clicked')">Request Money</button>
+    </div>
+
+    <div class="transactions">
+      <h2>Recent Transactions</h2>
+      <div class="transaction">
+        <span>Payment to Alice</span>
+        <span>-$120.00</span>
+      </div>
+      <div class="transaction">
+        <span>Received from Bob</span>
+        <span>+$500.00</span>
+      </div>
+      <div class="transaction">
+        <span>Payment to Netflix</span>
+        <span>-$15.99</span>
+      </div>
+    </div>
+  </main>
 
   <script type="module" src="./js/dashboard.js"></script>
 </body>
