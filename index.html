@@ -1,140 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NovaBank - Digital Banking</title>
-<link rel="stylesheet" href="css/styles.css">
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: #f3f4f6;
-}
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* NAVBAR */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+      text-align: center;
+    }
 
-.logo {
-    font-weight: bold;
-    font-size: 20px;
-    color: #1e3a8a;
-}
+    a {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
 
-.nav-btn {
-    background: #2563eb;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-/* HERO */
-.hero {
-    text-align: center;
-    padding: 60px 20px;
-    background: linear-gradient(135deg, #1e3a8a, #2563eb);
-    color: white;
-}
-
-.hero h1 {
-    font-size: 32px;
-    margin-bottom: 10px;
-}
-
-.hero p {
-    font-size: 16px;
-    opacity: 0.9;
-}
-
-.hero button {
-    margin-top: 20px;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 10px;
-    background: white;
-    color: #1e3a8a;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* FEATURES */
-.features {
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.features h2 {
-    margin-bottom: 20px;
-}
-
-.feature-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-}
-
-.feature {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-}
-
-/* FOOTER */
-.footer {
-    text-align: center;
-    padding: 20px;
-    color: #64748b;
-    font-size: 13px;
-}
-</style>
+    a:hover {
+      background: #1d4ed8;
+    }
+  </style>
 </head>
+
 <body>
-
-<div class="navbar">
-    <div class="logo">NovaBank</div>
-    <a class="nav-btn" href="login.html">Login</a>
-</div>
-
-<div class="hero">
-    <h1>Modern Banking for the Digital Age</h1>
-    <p>Send, receive, and manage your money securely anytime, anywhere.</p>
-    <button onclick="location.href='login.html'">Get Started</button>
-</div>
-
-<div class="features">
-    <h2>Why Choose NovaBank?</h2>
-
-    <div class="feature-grid">
-        <div class="feature">
-            <h3>Instant Transfers</h3>
-            <p>Send and receive money in seconds.</p>
-        </div>
-
-        <div class="feature">
-            <h3>Secure Accounts</h3>
-            <p>Advanced encryption protects your funds and data.</p>
-        </div>
-
-        <div class="feature">
-            <h3>Mobile First</h3>
-            <p>Designed for a seamless experience on any device.</p>
-        </div>
-    </div>
-</div>
-
-<div class="footer">
-    © 2026 NovaBank. All rights reserved.
-</div>
-
+  <div>
+    <h1>Welcome</h1>
+    <p>Secure Admin Portal</p>
+    <a href="login.html">Go to Login</a>
+  </div>
 </body>
 </html>
