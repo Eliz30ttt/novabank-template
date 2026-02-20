@@ -1,88 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NovaBank Admin</title>
-<link rel="stylesheet" href="style.css">
+
 <style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f5f7fa;
-    margin: 0;
-    padding: 0;
-  }
-  header {
-    background-color: #003366;
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  header h1 {
-    margin: 0;
-    font-size: 24px;
-  }
-  header button {
-    background-color: #ffcc00;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  main {
-    padding: 30px;
-  }
-  .user-list {
-    background-color: white;
-    border-radius: 15px;
-    padding: 20px;
-  }
-  .user-list h2 {
-    margin-top: 0;
-  }
-  .user {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-  }
-  .user button {
-    background-color: #003366;
-    color: #ffcc00;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f7fb;
+  margin: 0;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+header button {
+  background: #ffcc00;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+main {
+  padding: 30px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  font-size: 22px;
+  font-weight: bold;
+}
 </style>
 </head>
+
 <body>
-  <header>
-    <h1>Admin Portal</h1>
-    <button id="logoutBtn">Logout</button>
-  </header>
 
-  <main>
-    <div class="user-list">
-      <h2>All Users</h2>
-      <div class="user">
-        <span>user1@novabank.com</span>
-        <button>View</button>
-      </div>
-      <div class="user">
-        <span>user2@novabank.com</span>
-        <button>View</button>
-      </div>
-      <div class="user">
-        <span>admin@novabank.com</span>
-        <button>View</button>
-      </div>
-    </div>
-  </main>
+<header>
+  <h2>Admin Control Panel</h2>
+  <button onclick="logout()">Logout</button>
+</header>
 
-  <script type="module" src="./js/admin.js"></script>
+<main>
+
+<div class="card">
+  <h3>Total Bank Balance (All Clients)</h3>
+  <div class="stat" id="totalBalance">$0.00</div>
+</div>
+
+<div class="card">
+  <h3>System Controls</h3>
+  <button onclick="resetSystem()">Reset Entire System</button>
+</div>
+
+</main>
+
+<script>
+function calculateTotal() {
+  let balance = localStorage.getItem("balance");
+  if (!balance) balance = 0;
+  document.getElementById("totalBalance").innerText =
+    "$" + parseFloat(balance).toFixed(2);
+}
+
+function resetSystem() {
+  if (confirm("Are you sure you want to reset everything?")) {
+    localStorage.clear();
+    alert("System reset complete.");
+    calculateTotal();
+  }
+}
+
+function logout() {
+  window.location.href = "login.html";
+}
+
+calculateTotal();
+</script>
+
 </body>
 </html>
